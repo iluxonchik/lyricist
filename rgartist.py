@@ -16,6 +16,11 @@ class RGArtist(object):
         def RG_ARTIST_SONGS_BASE_URL():
             return "http://genius.com/artists/songs?for_artist_page="
 
+        @constant
+        def RG_ARTIST_PAGENUM_PREF():
+            """ Prefix for page number """
+            return "&page="
+
     def __init__(self, artist_url):
         self.CONST = self._Const()
         self.urlopener = BSOpener()
@@ -44,17 +49,50 @@ class RGArtist(object):
         return re.findall("[0-9]+$", content_val)[0]
 
     def _get_songs_BSObj(self, page_num=1):
-        return bsObj
+        """ Returns a list of song BeautifulSoup objects 
 
-    def get_songs(self, page_num=1):
+            The returned list contains the <li>'s of each song, the song url and other info, 
+            such as the song title, can be extracted from it.
+
+            Returns:
+                list: list of song BeautifulSoup objects if there is at least one song on the page
+                None: if there are no songs on the page
+        """
+        page_url = self.artist_songs + self.CONST.RG_ARTIST_PAGENUM_PREF + str(page_num)
+        print("Page url = " + page_url)
+        bsObj = self.urlopener.bsopen(page_url)
+        song_container = bsObj.find("ul", {"class":["song_list", "primary_list"]})
+        
+        if song_container is None:
+            return None # no songs found on the page
+        
+        return song_container.findAll("li")
+
+    def get_songs_url(self, page_num=1):
         """ Return a list of song urls from page page_num.
 
             Returns:
-                list: list of song urls if there is at least one song on the page
+                list: list of song urls (as strings) if there is at least one song on the page
                 None: if there are no songs on the page
 
         """
-        pass
+        bsObj_list = self._get_songs_BSObj(page_num)
+        if bsObj_list is None:
+            return None # no songs found on the page
+
+        song_urls = [] # contains the list of song urls found on the page
+        # not using list comprehension because we want to filter out None's
+        for bsObj in bsObj_list:
+            anchor = bsObj.find("a", {"class":"song_link"})
+            # make sure that we don't include any None's in our urls list
+            if anchor is not None:
+                url = anchor.attrs["href"]
+                if url is not None:
+                    song_urls += [url]
+
+        # we don't want to return empty lists
+        return song_urls if len(song_urls) > 0 else None
+
 
     def get_song_text(self, url):
         """ Returns song text as a string """
