@@ -68,6 +68,10 @@ class RGArtist(object):
         
         return song_container.findAll("li")
 
+    def _get_song_text_BSObj(self, song_url):
+        """ Returns BeautifulSoup object with the lyrics content """
+        return self.urlopener.bsopen(song_url).find("lyrics", {"class":"lyrics"}).find("p")
+
     def get_songs_url(self, page_num=1):
         """ Return a list of song urls from page page_num.
 
@@ -120,12 +124,10 @@ class RGArtist(object):
 
     def get_song_text(self, url):
         """ Returns song text as a string """
-        pass
+        result = ""
+        bsObj = self._get_song_text_BSObj(url)
+        return "".join(bsObj.find_all(text=True))
 
     def get_song_title(self, url):
         """ Returns song title as a string """
-        pass
-
-    def get_song_text_BSObj(self, url):
-        """ Return BeautifulSoup instance for a song url """
         pass
