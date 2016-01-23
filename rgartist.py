@@ -93,6 +93,30 @@ class RGArtist(object):
         # we don't want to return empty lists
         return song_urls if len(song_urls) > 0 else None
 
+    def get_songs_title(self, page_num=1):
+        """ Return a list of song titles from page page_num.
+
+            Returns:
+                list: list of song titles (as strings) if there is at least one song on the page
+                None: if there are no songs on the page
+        """
+        bsObj_list = self._get_songs_BSObj(page_num)
+        if bsObj_list is None:
+            return None # no songs found on the page
+
+        song_titles = [] # contains the list of song titles found on the page
+        # not using list comprehension because we want to filter out None's
+        for bsObj in bsObj_list:
+            span = bsObj.find("span", {"class":"song_title"})
+            # make sure that we don't include any None's or empty strings in our titles list
+            if span not in [None, ""]:
+                title = span.get_text()
+                if title is not None:
+                    song_titles += [title]
+
+        # we don't want to return empty lists
+        return song_titles if len(song_titles) > 0 else None
+
 
     def get_song_text(self, url):
         """ Returns song text as a string """
