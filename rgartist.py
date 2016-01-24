@@ -72,7 +72,7 @@ class RGArtist(object):
         """ Returns BeautifulSoup object with the lyrics content """
         return self.urlopener.bsopen(song_url).find("lyrics", {"class":"lyrics"}).find("p")
 
-    def get_songs_url(self, page_num=1):
+    def get_song_urls(self, page_num=1):
         """ Return a list of song urls from page page_num.
 
             Returns:
