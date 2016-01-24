@@ -126,7 +126,7 @@ class RGArtist(object):
         """ Returns song text as a string """
         result = ""
         bsObj = self._get_song_text_BSObj(url)
-        return "".join(bsObj.find_all(text=True))
+        return "".join(bsObj.find_all(text=True)) if bsObj is not None else ""
 
     def get_song_title(self, url):
         """ Returns song title as a string """
