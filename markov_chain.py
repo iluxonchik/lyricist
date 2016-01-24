@@ -5,7 +5,6 @@ class MarkovChain(object):
 
     def __init__(self, text=None):
         self._states_map = {}
-        
         if text is not None:
             self.add_text(text)
 
@@ -15,6 +14,13 @@ class MarkovChain(object):
         for i in range(0, len(word_list)-1):
             self._states_map.setdefault(word_list[i], []).append(word_list[i+1])
         return self
+
+    def add_text_collection(self, text_col, separator=" "):
+        """ Adds a collection of text strings to the markov chain """
+        for line in text_col:
+            if line not in ["", "\n", None]:
+                self.add_text(line, separator)
+
 
     def get_word(self, key):
         """ Returns a word from Markov Chain associated with the key """
