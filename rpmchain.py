@@ -5,15 +5,19 @@ from text_filter import Pipeline
 from const import constant
 import collections, re
 
-class RemoveSqBrackets(TextFilter):
+class RemoveSqBracketsFilter(TextFilter):
     """ Removes all of the square brackets and its content """
     def apply(self, text):
         return re.sub("\[(.*?)\]", "", text)
 
-class RemoveParens(TextFilter):
+class RemoveParensFilter(TextFilter):
     """ Removes parentheses only, keeps their content """
     def apply(self, text):
         return re.sub("\(|\)", "", text)
+
+class AllLowerCaseFilter(TextFilter):
+    def apply(self, text):
+        return text.lower()
 
 class RGMChain(object):
     """ This is the class responsible for interface between RGArtist and Markov Chains. """
@@ -21,7 +25,7 @@ class RGMChain(object):
     class _Const(object):
         @constant
         def DEFAULT_PIPELINE():
-            return Pipeline([RemoveSqBrackets(), RemoveParens()]) 
+            return Pipeline([RemoveSqBracketsFilter(), RemoveParensFilter(), AllLowerCaseFilter()]) 
 
 
     def __init__(self, artists = None,  pip = None):
