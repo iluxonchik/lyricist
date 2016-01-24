@@ -1,3 +1,4 @@
+import collections
 from abc import ABCMeta, abstractmethod
 
 class TextFilter(object, metaclass=ABCMeta):
@@ -22,8 +23,12 @@ class Pipeline(object):
         self._filters = []
 
         if filters is not None:
+            # if a single filter was provided, turn it into a list
+            if not isinstance(filters, collections.Iterable):
+                filters = [filters]
+                
             for fil in filters:
-                self.add_filter(fil)
+                self.add(fil)
 
     def add(self, fil):
         if isinstance(filter, TextFilter):
