@@ -5,6 +5,8 @@ from text_filter import Pipeline
 from const import constant
 import collections, re
 
+import pickle
+
 class RemoveSqBracketsFilter(TextFilter):
     """ Removes all of the square brackets and its content """
     def apply(self, text):
@@ -31,7 +33,7 @@ class RGMChain(object):
     def __init__(self, artists = None,  pip = None):
         self._CONS = self._Const()
         self._artists = artists if artists is not None else [] # list of RGArtist objects
-        
+            
         # if a single artist was provided, turn it into a list
         if not isinstance(self._artists, collections.Iterable):
             self._artists = [self._artists]
@@ -56,12 +58,13 @@ class RGMChain(object):
             if page_limit is not None:
                 if num_pages >= page_limit:
                     break
-
+            song_num = 0
             for song_url in song_urls:
                 song_text = artist.get_song_text(song_url)
                 filtered_text = self._pipeline.apply(song_text)
-                print(filtered_text)
                 self._mchain.add_text_collection(filtered_text.split("\n"))
+                song_num += 1
+                print("Song: " + str(song_num))
 
             num_pages += 1
             song_urls = artist.get_song_urls(num_pages+1)
