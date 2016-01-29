@@ -29,6 +29,25 @@ class RGMChain(object):
         def DEFAULT_PIPELINE():
             return Pipeline([RemoveSqBracketsFilter(), RemoveParensFilter(), AllLowerCaseFilter()]) 
 
+    def _build_mchain_for_artist(self, artist, page_limit=None):
+        num_pages = 0
+        song_urls = artist.get_song_urls(num_pages+1)
+        while song_urls is not None:
+            # if needed, break due to page limit
+            if page_limit is not None:
+                if num_pages >= page_limit:
+                    break
+            song_num = 0
+            for song_url in song_urls:
+                song_text = artist.get_song_text(song_url)
+                filtered_text = self._pipeline.apply(song_text)
+                self._mchain.add_text_collection(filtered_text.split("\n"))
+                song_num += 1
+                print("Song: " + str(song_num))
+
+            num_pages += 1
+            song_urls = artist.get_song_urls(num_pages+1)
+
 
     def __init__(self, artists = None,  pip = None):
         self._CONS = self._Const()
@@ -50,21 +69,38 @@ class RGMChain(object):
         for artist in self._artists:
             self._build_mchain_for_artist(artist, page_limit)
 
-    def _build_mchain_for_artist(self, artist, page_limit=None):
-        num_pages = 0
-        song_urls = artist.get_song_urls(num_pages+1)
-        while song_urls is not None:
-            # if needed, break due to page limit
-            if page_limit is not None:
-                if num_pages >= page_limit:
-                    break
-            song_num = 0
-            for song_url in song_urls:
-                song_text = artist.get_song_text(song_url)
-                filtered_text = self._pipeline.apply(song_text)
-                self._mchain.add_text_collection(filtered_text.split("\n"))
-                song_num += 1
-                print("Song: " + str(song_num))
+    def generate_sentence(self, num_words, seed=None, capitalize_first_word=False, end_with_period=False, end_on_nores=False):
+        """ Generates and returns a sentence with num_words words, starting with the word seed.
 
-            num_pages += 1
-            song_urls = artist.get_song_urls(num_pages+1)
+            Keyword arguments:
+            seed -- the word with wich to begin the sentence. If no seed word is provided, a random starting word is chosen.
+            end_on_nores -- end the sentence and return it, even if less than num_words have been added so far in case the markov
+                chain does not have a match for a word.
+        """
+        if seed is None:
+            # select a random staring word
+            seed = self._mchain.get_random_key()
+
+        if capitalize_first_word:
+            sentence = seed.capitalize()
+        else:
+            sentence = seed
+
+        word_cnt = 1 # words so far in the sentence
+        
+        while word_cnt < num_words:
+            seed = self._mchain.get_word(seed) # update word (get next word)
+            if seed is None:
+                if end_on_nores:
+                    return sentence
+            else:
+                seed = self._mchain.get_random_key()
+
+            sentence += " " + seed
+            word_cnt += 1
+        
+
+        if end_with_period:
+            sentence += "."
+
+        return sentence

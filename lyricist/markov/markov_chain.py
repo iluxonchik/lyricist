@@ -1,4 +1,4 @@
-from random import choice
+import random
 
 class MarkovChain(object):
     """ An interface for signle-word states Markov Chains """
@@ -25,4 +25,7 @@ class MarkovChain(object):
     def get_word(self, key):
         """ Returns a word from Markov Chain associated with the key """
         values = self._states_map.get(key)
-        return choice(values) if values is not None else None
+        return random.choice(values) if values is not None else None
+
+    def get_random_key(self):
+        return random.choice(list(self._states_map.keys()))
