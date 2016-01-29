@@ -1,8 +1,8 @@
-from markov_chain import MarkovChain
-from rgartist import RGArtist
-from text_filter import TextFilter
-from text_filter import Pipeline
-from const import constant
+from .markov.markov_chain import MarkovChain
+from .rapgenius.rgartist import RGArtist
+from .text_filter import TextFilter
+from .text_filter import Pipeline
+from .const import constant
 import collections, re
 
 import pickle

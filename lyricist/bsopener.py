@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from urllib.request import Request
-from const import constant
+from .const import constant
 
 class BSOpener(object):
     """ A wrapper arround urllib and BeautifulSoup used a helper for url requests """

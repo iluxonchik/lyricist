@@ -1,7 +1,7 @@
 import re
 from bs4 import BeautifulSoup
-from const import constant
-from bsopener import BSOpener
+from ..const import constant
+from ..bsopener import BSOpener
 
 class RGArtist(object):
     """RapGeniusArtist"""
