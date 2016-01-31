@@ -29,6 +29,31 @@ class RGMChain(object):
         def DEFAULT_PIPELINE():
             return Pipeline([RemoveSqBracketsFilter(), RemoveParensFilter(), AllLowerCaseFilter()]) 
 
+    def __init__(self, artists = None,  pip = None, mchain=None):
+        self._CONS = self._Const()
+        self._artists = artists if artists is not None else [] # list of RGArtist objects
+            
+        # if a single artist was provided, turn it into a list
+        if not isinstance(self._artists, collections.Iterable):
+            self._artists = [self._artists]
+        
+        self._mchain = MarkovChain() if mchain is None else mchain
+        self._pipeline = pip if pip is not None else self._CONS.DEFAULT_PIPELINE
+
+    # Properties
+    @property
+    def mchain(self):
+        """ MChain object associated with this instance """
+        return self._mchain
+
+    @mchain.setter
+    def mchain(self, value):
+        self_.machain = value
+
+    @mchain.deleter
+    def mchain(self):
+        self._mchain = None
+
     def _build_mchain_for_artist(self, artist, page_limit=None):
         num_pages = 0
         song_urls = artist.get_song_urls(num_pages+1)
@@ -47,18 +72,6 @@ class RGMChain(object):
 
             num_pages += 1
             song_urls = artist.get_song_urls(num_pages+1)
-
-
-    def __init__(self, artists = None,  pip = None):
-        self._CONS = self._Const()
-        self._artists = artists if artists is not None else [] # list of RGArtist objects
-            
-        # if a single artist was provided, turn it into a list
-        if not isinstance(self._artists, collections.Iterable):
-            self._artists = [self._artists]
-        
-        self._mchain = MarkovChain()
-        self._pipeline = pip if pip is not None else self._CONS.DEFAULT_PIPELINE
 
     def add_artist(self, artist):
         self._artists.append(artist)
