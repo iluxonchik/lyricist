@@ -18,6 +18,9 @@ class Program(object):
         self._min_words = None
         self._max_words = None
         self._seed = None
+        self._out_file = None
+        self._in_mchain_file = None
+        self._load_from_file = None
 
     def positive_int(self, value):
         MSG = "Argument must be a positive integer."
@@ -39,6 +42,9 @@ class Program(object):
         parser.add_argument("-v", "--verses", default=[3, 10], nargs=2, type=self.positive_int, metavar=("MIN_VERSES", "MAX_VERSES"), help="speciefies the minimum and the maximum amount of verses in the song. The actual number of verses is chosen randomly from that range.")
         parser.add_argument("-w", "--words", default=[5, 10], nargs=2, type=self.positive_int, metavar=("MIN_WORDS", "MAX_WORDS"),help="speciefies the minimum and the maximum amount of words in a line. The actual numer of words in a line is chosen randomly from that range for each line.")
         parser.add_argument("-s", "--seed", help="seed word: the word with each to begin the song. If no value is provided a random one is chosen.")
+        parser.add_argument("-o", "--output", metavar="FILE_NAME", help="save song to file. Saves the song to the specified file.")
+        parser.add_argument("-m", "--mchain", metavar="FILE_NAME", help="save the created MChain object to file. This later allows to instantiate an artist with that MChain. This is useful because scraping is a relatively lengthy process and saving the scraped content for later use is more convinient than having to re-scrape the whole thing again.")
+        parser.add_argument("-f", "--file", default=False, action="store_true", help="instantiate the program with an existing MChain instead of scraping the songs and building a new Markov Chain from them. If this argument is present, the artist arguments are treated as MChain file names [currently only supports one Mchain object].")
 
         return parser
         
@@ -55,6 +61,10 @@ class Program(object):
         self._min_words = args.words[0]
         self._max_words = args.words[1]
         self._seed = args.seed
+        self._out_file = args.output
+        self._in_mchain_file = args.mchain
+        self._load_from_file = args.file
+
 
 
 if __name__ == "__main__":
