@@ -22,6 +22,8 @@ class Program(object):
         self._in_mchain_file = None
         self._load_from_file = None
 
+        self._rpmchain = None
+
     def positive_int(self, value):
         MSG = "Argument must be a positive integer."
         try:
@@ -65,7 +67,25 @@ class Program(object):
         self._in_mchain_file = args.mchain
         self._load_from_file = args.file
 
+    def _setup_state(self):
+        """ Sets up the RGMChain instance based on the command line args. """
+        if self._load_from_file:
+            # load MChain from file, treat artist argumet as file names
+            # NOTE: for now only supports a single MChain object
+            # TODO: if multiple file names are provided, combine the MChain state maps
+            try:
+                mchain = pickle.load(open(self._artists[0], "rb"))
+            except (IOError, FileNotFoundError) as e:
+                print("Error opening file, please make sure that the file exists.")
+                print(e)
+            self._rgmchain = RGMChain(mchain=mchain)
+        else:
+            # instantiate RGMChain from artist list
+            self._rgmchain = RGMChain(artists=[RGArtist(elem) if self._is_url(elem) else RGArtist().from_artist_name(elem) for elem in artists])
 
+    def _is_url(self, value):
+        """ Given a string, returns True if it represents a url, False else """
+        return len(re.find("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", value)) > 0
 
 if __name__ == "__main__":
     program = Program()
