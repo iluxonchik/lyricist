@@ -24,4 +24,10 @@ class BSOpener(object):
             headers=self.CONST.HEADERS
 
         req = Request(url=url, headers=headers)
-        return BeautifulSoup(urlopen(req), "html.parser")
+        try:
+            html = urlopen(req)
+        except urllib.error.HTTPError:
+            print("WARNING: exception during opening url: " + url)
+            return None
+            
+        return BeautifulSoup(html, "html.parser")
