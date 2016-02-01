@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from urllib.request import Request
+from urllib.error import HTTPError
 from .const import constant
 
 class BSOpener(object):
@@ -26,8 +27,8 @@ class BSOpener(object):
         req = Request(url=url, headers=headers)
         try:
             html = urlopen(req)
-        except urllib.error.HTTPError:
+        except HTTPError:
             print("WARNING: exception during opening url: " + url)
             return None
-            
+
         return BeautifulSoup(html, "html.parser")

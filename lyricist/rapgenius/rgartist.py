@@ -70,7 +70,8 @@ class RGArtist(object):
 
     def _get_song_text_BSObj(self, song_url):
         """ Returns BeautifulSoup object with the lyrics content """
-        return self.urlopener.bsopen(song_url).find("lyrics", {"class":"lyrics"}).find("p")
+        bsObj = self.urlopener.bsopen(song_url)
+        return bsObj.find("lyrics", {"class":"lyrics"}).find("p") if bsObj is not None else None
 
     def get_song_urls(self, page_num=1):
         """ Return a list of song urls from page page_num.
