@@ -1,7 +1,7 @@
-from lyricist import rpmchain
+from lyricist.rpmchain import RGMChain
 from lyricist.rapgenius.rgartist import RGArtist
 from lyricist.markov.markov_chain import MarkovChain
-import argparse, collections
+import argparse, collections, random, re
 import pickle
 
 class Program(object):
@@ -64,8 +64,41 @@ class Program(object):
         self._max_words = args.words[1]
         self._seed = args.seed
         self._out_file = args.output
-        self._in_mchain_file = args.mchain
-        self._load_from_file = args.file
+        self._out_mchain_file = args.mchain
+        self._load_from_file = args.file # boolean
+
+        self._setup_state()
+
+        return self
+
+    def build_chain(self):
+        """ Build the Markov Chain for the specified artist(s) 
+
+            If necessary (i.e. if no input MChain object was provided) scrape the necessary song
+            lyrics and build a Markov Chain from them.
+        """
+        if self._load_from_file:
+            return self # Markov Chain already loaded, no need to build it
+        else:
+            self._rgmchain.build_mchain() # this might take a while...
+            if self._out_mchain_file is not None:
+                # save MChain if needed
+                pickle.dump(self._rgmchain.mchain, open(self._out_mchain_file, "wb"))
+            return self
+
+    def compose(self):
+        """ Composes the song """
+        song = ""
+        seed = self._seed
+        for _ in range(0, random.choice(range(self._min_verses, self._max_verses+1))): # num verses
+            for _ in range(random.choice(range(self._min_lines, self._max_lines+1))): # num lines in each verse
+                num_words = random.choice(range(self._min_words, self._max_words+1)) # num words in each line
+                song += self._rgmchain.generate_sentence(num_words, seed=seed) + "\n"
+                seed = None # only use seed (if present for the first sentence)
+            song += "\n" # newline at the end of the verse
+
+        return song
+
 
     def _setup_state(self):
         """ Sets up the RGMChain instance based on the command line args. """
@@ -81,12 +114,17 @@ class Program(object):
             self._rgmchain = RGMChain(mchain=mchain)
         else:
             # instantiate RGMChain from artist list
-            self._rgmchain = RGMChain(artists=[RGArtist(elem) if self._is_url(elem) else RGArtist().from_artist_name(elem) for elem in artists])
+            self._rgmchain = RGMChain(artists=[RGArtist(elem) if self._is_url(elem) else RGArtist.from_artist_name(elem) for elem in self._artists])
+
+        return self
 
     def _is_url(self, value):
         """ Given a string, returns True if it represents a url, False else """
-        return len(re.find("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", value)) > 0
+        return len(re.findall("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", value)) > 0
 
 if __name__ == "__main__":
     program = Program()
     program.parse_args()
+    program.build_chain()
+    song = program.compose()
+    print(song)
