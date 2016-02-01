@@ -73,6 +73,10 @@ class RGMChain(object):
             num_pages += 1
             song_urls = artist.get_song_urls(num_pages+1)
 
+    def add_filter(self, fil):
+        """ Adds a new text filter to the pipeline """
+        self._pipeline.add(fil)
+
     def add_artist(self, artist):
         self._artists.append(artist)
         return self._artists # allows chaining
