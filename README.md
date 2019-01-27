@@ -96,7 +96,7 @@ Please note that using **artist's url**, instead of the artist's name as the arg
 is **recommended**. This is due to the fact that Rap Genius doesn't seem to have a well defined standart for 
 artist name urls. Under the hood, the program assumes that the artist url is in the form `http://genius.com/artists/<artist_name>`, 
 where `<artist_name>` is the artist_name provided as an argument with spaces replaced by "-" and "." removed. 
-This result in an an invalid url, since as mentioned previously, Rap Genius doesn't seem to be following any 
+This result in an invalid url, since as mentioned previously, Rap Genius doesn't seem to be following any 
 convention for the names (for example, sometimes "." in names simply get removed, while in other instances they get 
 replaced by "-"). For example if `<artist_name> = "The Game`, this will result in the artist url `http://genius.com/artists/The-Game`.
 
